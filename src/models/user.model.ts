@@ -7,7 +7,9 @@ export interface UserInput {
   password: string;
 }
 
-export interface UserDoc extends UserInput, Document {}
+export interface UserDoc extends UserInput, Document {
+  comparePassword: (candidate: string) => Promise<boolean>;
+}
 
 let userSchema = new Schema<UserDoc>({
   username: {
@@ -35,6 +37,10 @@ userSchema.pre("save", async function (this: UserDoc, next) {
   this.password = hash;
   next();
 });
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 let User = model<UserDoc>("User", userSchema);
 export default User;
