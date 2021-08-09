@@ -50,9 +50,28 @@ export let protectRoutes = catchAsync(async (req, res, next) => {
 
   //check to see if user did not changed his password after issuing the token
   if (user.isPasswordChanged(data.iat!))
-    return next("invalid token : user changed password recently token");
+    return next("invalid token : user changed password recently");
 
   req.user = user;
 
   next();
+});
+
+export let updateProfile = catchAsync(async (req, res, next) => {
+  let { password, passwordConfirm } = req.body;
+  if (password || passwordConfirm)
+    return res
+      .status(400)
+      .json({ error: "for updating password use update password route" });
+
+  let user = await User.findByIdAndUpdate(req.user?._id, req.body, {
+    runValidators: true,
+    new: true,
+  });
+  if (!user)
+    return res.status(404).json({ status: "failed", error: "user not found" });
+
+  res.status(200).json({
+    user,
+  });
 });
