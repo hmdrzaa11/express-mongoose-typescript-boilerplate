@@ -11,25 +11,34 @@ export interface UserDoc extends UserInput, Document {
   comparePassword: (candidate: string) => Promise<boolean>;
 }
 
-let userSchema = new Schema<UserDoc>({
-  username: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 4,
+let userSchema = new Schema<UserDoc>(
+  {
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 4,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 8,
-  },
-});
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret.password;
+      },
+    },
+  }
+);
 
 userSchema.pre("save", async function (this: UserDoc, next) {
   if (!this.isModified("password")) return next();
