@@ -75,3 +75,18 @@ export let updateProfile = catchAsync(async (req, res, next) => {
     user,
   });
 });
+
+export let updatePassword = catchAsync(async (req, res, next) => {
+  let { password, newPassword } = req.body;
+  let user = await User.findById(req.user?._id);
+  let isPasswordMatch = await user?.comparePassword(password);
+  if (!isPasswordMatch)
+    return res.status(400).json({ error: "wrong password" });
+
+  user!.password = newPassword;
+  await user?.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    user,
+  });
+});
