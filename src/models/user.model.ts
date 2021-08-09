@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Query } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface UserInput {
@@ -39,6 +39,7 @@ let userSchema = new Schema<UserDoc>(
       transform: function (doc, ret) {
         delete ret.password;
       },
+      virtuals: true,
     },
   }
 );
@@ -59,6 +60,12 @@ userSchema.methods.isPasswordChanged = function (this: UserDoc, tokenIat) {
 
   return this.passwordChangedAt.getTime() / 1000 > tokenIat;
 };
+
+userSchema.virtual("posts", {
+  ref: "Post",
+  localField: "_id",
+  foreignField: "user",
+});
 
 let User = model<UserDoc>("User", userSchema);
 export default User;
