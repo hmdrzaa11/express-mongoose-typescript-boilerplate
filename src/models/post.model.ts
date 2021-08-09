@@ -1,4 +1,4 @@
-import { model, Schema, Types, Document } from "mongoose";
+import { model, Schema, Types, Document, Query } from "mongoose";
 
 interface PostInput {
   title: string;
@@ -15,6 +15,15 @@ let postSchema = new Schema<PostDoc>(
   },
   { timestamps: true }
 );
+
+postSchema.pre<Query<PostDoc>>(/^find/, function (next) {
+  this.populate({
+    path: "userId",
+    select: "-__v",
+  });
+
+  next();
+});
 
 let Post = model<PostDoc>("Post", postSchema);
 
