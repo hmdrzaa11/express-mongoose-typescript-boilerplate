@@ -90,14 +90,3 @@ export let updatePassword = catchAsync(async (req, res, next) => {
     user,
   });
 });
-
-export let getAllUsers = catchAsync(async (req, res, next) => {
-  let users = await User.find().populate({
-    path: "posts",
-    select: "-__v",
-  });
-  res.send({
-    status: "success",
-    users,
-  });
-});

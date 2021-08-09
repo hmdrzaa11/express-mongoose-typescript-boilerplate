@@ -34,6 +34,4 @@ userRouter.patch(
   userController.updatePassword
 );
 
-userRouter.get("/", userController.getAllUsers);
-
 export default userRouter;
