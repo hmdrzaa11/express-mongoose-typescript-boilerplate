@@ -10,7 +10,9 @@ export const requestValidator = (schema: AnySchema) => {
       });
       next();
     } catch (error) {
-      next(error);
+      return res.status(400).json({
+        error,
+      });
     }
   };
 };

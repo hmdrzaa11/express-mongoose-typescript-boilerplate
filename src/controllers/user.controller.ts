@@ -16,7 +16,7 @@ export let signin = catchAsync(async (req, res, next) => {
   let user = await User.findOne({ email });
   if (!user)
     return res.status(404).json({ error: "invalid email or password" });
-  let isPasswordMatch = user.comparePassword(password);
+  let isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch)
     return res.status(404).json({ error: "invalid email or password" });
 
