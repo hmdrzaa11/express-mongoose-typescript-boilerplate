@@ -1,6 +1,12 @@
+import jwt from "jsonwebtoken";
+import config from "../config";
 import User from "../models/user.model";
 import { catchAsync } from "../utils/catchAsync";
 import { sendJwt } from "../utils/sendJwt";
+
+interface JwtPayload extends jwt.JwtPayload {
+  id: string;
+}
 
 export let signup = catchAsync(async (req, res, next) => {
   let { username, password, email } = req.body;
@@ -21,4 +27,32 @@ export let signin = catchAsync(async (req, res, next) => {
     return res.status(404).json({ error: "invalid email or password" });
 
   sendJwt(req, res, 201, user);
+});
+
+export let protectRoutes = catchAsync(async (req, res, next) => {
+  let token = "";
+
+  //we check the headers
+  if (
+    req.headers["authorization"] &&
+    req.headers["authorization"].startsWith("Bearer")
+  ) {
+    token = req.headers["authorization"].split(" ")[1];
+  }
+
+  if (!token) return next("unauthorized you need to login");
+
+  let data = jwt.verify(token, config.jwtSecret) as JwtPayload;
+
+  let user = await User.findOne({ _id: data.id });
+
+  if (!user) return next("invalid token please login again");
+
+  //check to see if user did not changed his password after issuing the token
+  if (user.isPasswordChanged(data.iat!))
+    return next("invalid token : user changed password recently token");
+
+  req.user = user;
+
+  next();
 });

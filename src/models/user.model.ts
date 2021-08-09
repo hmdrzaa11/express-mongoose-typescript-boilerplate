@@ -9,6 +9,8 @@ export interface UserInput {
 
 export interface UserDoc extends UserInput, Document {
   comparePassword: (candidate: string) => Promise<boolean>;
+  isPasswordChanged: (tokenInitial: number) => boolean;
+  passwordChangedAt: Date;
 }
 
 let userSchema = new Schema<UserDoc>(
@@ -30,6 +32,7 @@ let userSchema = new Schema<UserDoc>(
       required: true,
       minlength: 8,
     },
+    passwordChangedAt: Date,
   },
   {
     toJSON: {
@@ -49,6 +52,12 @@ userSchema.pre("save", async function (this: UserDoc, next) {
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.isPasswordChanged = function (this: UserDoc, tokenIat) {
+  if (!this.passwordChangedAt) return false;
+
+  return this.passwordChangedAt.getTime() / 1000 > tokenIat;
 };
 
 let User = model<UserDoc>("User", userSchema);
