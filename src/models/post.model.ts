@@ -11,14 +11,14 @@ let postSchema = new Schema<PostDoc>(
   {
     title: { type: String, required: true, trim: true },
     content: { type: String, required: true, trim: true },
-    userId: { type: Types.ObjectId, ref: "User", required: true },
+    user: { type: Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
 
 postSchema.pre<Query<PostDoc>>(/^find/, function (next) {
   this.populate({
-    path: "userId",
+    path: "user",
     select: "-__v",
   });
 
