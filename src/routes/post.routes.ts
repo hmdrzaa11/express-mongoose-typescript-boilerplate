@@ -17,4 +17,10 @@ postRouter.get("/", postController.gerPosts);
 
 postRouter.get("/:id", postController.getSinglePost);
 
+postRouter.delete(
+  "/:id",
+  userController.protectRoutes,
+  postController.deletePost
+);
+
 export default postRouter;

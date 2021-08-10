@@ -28,3 +28,15 @@ export let getSinglePost = catchAsync(async (req, res, next) => {
 
   res.send({ post });
 });
+
+export let deletePost = catchAsync(async (req, res, next) => {
+  let id = req.params.id;
+  let userId = req.user?.id;
+  let post = await Post.findOne({ _id: id, user: userId });
+  if (!post)
+    return res
+      .status(404)
+      .send({ status: "failed", message: "post not found" });
+  await post.deleteOne();
+  res.sendStatus(204);
+});
