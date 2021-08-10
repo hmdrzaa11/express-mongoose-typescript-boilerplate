@@ -40,3 +40,16 @@ export let deletePost = catchAsync(async (req, res, next) => {
   await post.deleteOne();
   res.sendStatus(204);
 });
+
+export let updatePost = catchAsync(async (req, res, next) => {
+  let post = await Post.findOneAndUpdate(
+    { _id: req.params.id, user: req.user?.id },
+    req.body,
+    { new: true, runValidators: true }
+  );
+  if (!post)
+    return res.status(404).send({ status: "failed", msg: "not found" });
+  res.status(200).send({
+    post,
+  });
+});

@@ -22,5 +22,10 @@ postRouter.delete(
   userController.protectRoutes,
   postController.deletePost
 );
+postRouter.patch(
+  "/:id",
+  userController.protectRoutes,
+  postController.updatePost
+);
 
 export default postRouter;
