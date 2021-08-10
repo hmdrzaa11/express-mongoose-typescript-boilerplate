@@ -17,3 +17,14 @@ export let gerPosts = catchAsync(async (req, res, next) => {
     posts,
   });
 });
+
+export let getSinglePost = catchAsync(async (req, res, next) => {
+  let id = req.params.id;
+  let post = await Post.findOne({ _id: id });
+  if (!post)
+    return res
+      .status(404)
+      .send({ status: "failed", message: "post not found" });
+
+  res.send({ post });
+});
